@@ -43,13 +43,7 @@ const fn default_version() -> u32 {
 
 impl Default for Settings {
     fn default() -> Self {
-        Self {
-            schema: None,
-            version: default_version(),
-            agent: AgentSettings::default(),
-            providers: BTreeMap::new(),
-            models: BTreeMap::new(),
-        }
+        Self { schema: None, version: default_version(), agent: AgentSettings::default(), providers: BTreeMap::new(), models: BTreeMap::new() }
     }
 }
 
@@ -66,13 +60,7 @@ pub struct AgentSettings {
 
 impl Default for AgentSettings {
     fn default() -> Self {
-        Self {
-            model: "anthropic/claude-sonnet-4-5".to_string(),
-            temperature: 0.2,
-            max_steps: 60,
-            approval: Approval::Edits,
-            undo_per_turn: true,
-        }
+        Self { model: "anthropic/claude-sonnet-4-5".to_string(), temperature: 0.2, max_steps: 60, approval: Approval::Edits, undo_per_turn: true }
     }
 }
 
@@ -165,21 +153,14 @@ pub enum SettingsError {
 impl Settings {
     /// Parse settings from a string; `path` is only used in error messages.
     pub fn parse(text: &str, path: &Path) -> Result<Self, SettingsError> {
-        let settings: Self =
-            serde_json::from_str(text).map_err(|source| SettingsError::Parse {
-                path: path.to_path_buf(),
-                source,
-            })?;
+        let settings: Self = serde_json::from_str(text).map_err(|source| SettingsError::Parse { path: path.to_path_buf(), source })?;
         settings.validate_agent()?;
         Ok(settings)
     }
 
     /// Read and parse a settings file.
     pub fn load_from(path: &Path) -> Result<Self, SettingsError> {
-        let text = std::fs::read_to_string(path).map_err(|source| SettingsError::Read {
-            path: path.to_path_buf(),
-            source,
-        })?;
+        let text = std::fs::read_to_string(path).map_err(|source| SettingsError::Read { path: path.to_path_buf(), source })?;
         Self::parse(&text, path)
     }
 
@@ -191,24 +172,15 @@ impl Settings {
     /// Load the user's file when it exists, otherwise the bundled defaults.
     pub fn load() -> Result<Self, SettingsError> {
         let path = settings_path();
-        if path.is_file() {
-            Self::load_from(&path)
-        } else {
-            Self::bundled()
-        }
+        if path.is_file() { Self::load_from(&path) } else { Self::bundled() }
     }
 
     /// Resolve the configured model, or an explicit `id`, into a client-ready value.
     pub fn resolve(&self, id: Option<&str>) -> Result<ResolvedModel, SettingsError> {
         let requested = id.unwrap_or(self.agent.model.as_str()).to_string();
         let entry = self.model_entry(&requested)?;
-        let provider = self
-            .providers
-            .get(&entry.provider)
-            .ok_or_else(|| SettingsError::UnknownProvider {
-                model: requested.clone(),
-                provider: entry.provider.clone(),
-            })?;
+        let provider =
+            self.providers.get(&entry.provider).ok_or_else(|| SettingsError::UnknownProvider { model: requested.clone(), provider: entry.provider.clone() })?;
         Ok(ResolvedModel {
             id: requested,
             provider_name: entry.provider.clone(),
@@ -230,15 +202,9 @@ impl Settings {
         // `provider/model` shorthand, so a new model needs no `models` entry.
         match id.split_once('/') {
             Some((provider, model)) if !provider.is_empty() && !model.is_empty() => {
-                Ok(ModelEntry {
-                    provider: provider.to_string(),
-                    model: model.to_string(),
-                    context: None,
-                })
+                Ok(ModelEntry { provider: provider.to_string(), model: model.to_string(), context: None })
             }
-            _ => Err(SettingsError::UnknownModel {
-                model: id.to_string(),
-            }),
+            _ => Err(SettingsError::UnknownModel { model: id.to_string() }),
         }
     }
 
@@ -262,11 +228,7 @@ pub fn settings_path() -> PathBuf {
 }
 
 /// Pure path resolution, so it can be tested without mutating the process environment.
-fn resolve_settings_path(
-    explicit: Option<PathBuf>,
-    appdata: Option<PathBuf>,
-    home: Option<PathBuf>,
-) -> PathBuf {
+fn resolve_settings_path(explicit: Option<PathBuf>, appdata: Option<PathBuf>, home: Option<PathBuf>) -> PathBuf {
     if let Some(path) = explicit {
         return path;
     }
@@ -274,10 +236,7 @@ fn resolve_settings_path(
         return dir.join("AgenticEditCraft").join("settings.json");
     }
     if let Some(dir) = home {
-        return dir
-            .join(".config")
-            .join("agentic-edit-craft")
-            .join("settings.json");
+        return dir.join(".config").join("agentic-edit-craft").join("settings.json");
     }
     PathBuf::from(".agentic-edit-craft").join("settings.json")
 }
@@ -340,10 +299,7 @@ mod tests {
 
     #[test]
     fn reads_a_settings_file() {
-        let path = std::env::temp_dir().join(format!(
-            "agentic-edit-craft-settings-{}.json",
-            std::process::id()
-        ));
+        let path = std::env::temp_dir().join(format!("agentic-edit-craft-settings-{}.json", std::process::id()));
         let text = r#"{
             "version": 1,
             "agent": { "model": "local/test" },
@@ -386,11 +342,7 @@ mod tests {
         );
         assert!(appdata.ends_with("AgenticEditCraft/settings.json"));
 
-        let home = super::resolve_settings_path(
-            None,
-            None,
-            Some(std::path::PathBuf::from("/home/example")),
-        );
+        let home = super::resolve_settings_path(None, None, Some(std::path::PathBuf::from("/home/example")));
         assert!(home.ends_with(".config/agentic-edit-craft/settings.json"));
     }
 }

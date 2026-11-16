@@ -39,12 +39,7 @@ pub struct AgentSession {
 
 impl AgentSession {
     pub fn new(id: impl Into<String>) -> Self {
-        Self {
-            id: id.into(),
-            turn: 0,
-            entries: Vec::new(),
-            undo_group: None,
-        }
+        Self { id: id.into(), turn: 0, entries: Vec::new(), undo_group: None }
     }
 
     /// Start a turn and return the undo label every edit in it must carry.
@@ -74,11 +69,7 @@ impl AgentSession {
             let excess = self.entries.len() + 1 - MAX_ENTRIES;
             self.entries.drain(..excess);
         }
-        self.entries.push(TranscriptEntry {
-            role,
-            text: text.into(),
-            tool: tool.map(str::to_string),
-        });
+        self.entries.push(TranscriptEntry { role, text: text.into(), tool: tool.map(str::to_string) });
     }
 
     /// The transcript as plain text, for a client that wants a single prompt.

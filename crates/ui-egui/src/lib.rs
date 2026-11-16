@@ -15,12 +15,7 @@
 pub const UPDATE_APP: craft_update::app::App = craft_update::app::App {
     icon_png: Some(include_bytes!("../../../assets/app-icon/hicolor/128x128/apps/ai.storyteller.filmcraft.png")),
     accent: Some([0x8b, 0x5c, 0xf6]),
-    ..craft_update::app::App::new(
-        "agentic-edit-craft",
-        "Agentic Edit Craft",
-        "An agent edits the same timeline you do",
-        "submac-owner/Agentic-Edit-Craft",
-    )
+    ..craft_update::app::App::new("agentic-edit-craft", "Agentic Edit Craft", "An agent edits the same timeline you do", "submac-owner/Agentic-Edit-Craft")
 };
 
 /// A literal UI string in the language the interface is drawn in (`i18n::t`). Only literals: the

@@ -24,11 +24,7 @@ const fn plan_is_dry_by_default() -> bool {
 
 impl Default for EditPlan {
     fn default() -> Self {
-        Self {
-            summary: String::new(),
-            steps: Vec::new(),
-            dry_run: true,
-        }
+        Self { summary: String::new(), steps: Vec::new(), dry_run: true }
     }
 }
 
@@ -75,24 +71,15 @@ impl EditPlan {
             return Err(PlanError::EmptyPlan);
         }
         if self.steps.len() > Self::MAX_STEPS {
-            return Err(PlanError::TooManySteps {
-                count: self.steps.len(),
-                max: Self::MAX_STEPS,
-            });
+            return Err(PlanError::TooManySteps { count: self.steps.len(), max: Self::MAX_STEPS });
         }
         for (index, step) in self.steps.iter().enumerate() {
             let known = director_tool(&step.tool).is_some() || step.tool.starts_with("command.");
             if !known {
-                return Err(PlanError::UnknownTool {
-                    index,
-                    tool: step.tool.clone(),
-                });
+                return Err(PlanError::UnknownTool { index, tool: step.tool.clone() });
             }
             if !step.args.is_object() {
-                return Err(PlanError::InvalidArgs {
-                    index,
-                    tool: step.tool.clone(),
-                });
+                return Err(PlanError::InvalidArgs { index, tool: step.tool.clone() });
             }
         }
         Ok(())
@@ -100,13 +87,7 @@ impl EditPlan {
 
     /// Steps that would change the project.
     pub fn mutating_steps(&self) -> Vec<&PlanStep> {
-        self.steps
-            .iter()
-            .filter(|step| {
-                director_tool(&step.tool).is_some_and(|tool| tool.mutates)
-                    || step.tool.starts_with("command.")
-            })
-            .collect()
+        self.steps.iter().filter(|step| director_tool(&step.tool).is_some_and(|tool| tool.mutates) || step.tool.starts_with("command.")).collect()
     }
 
     /// True when applying this plan needs an explicit approval.
@@ -120,20 +101,12 @@ mod tests {
     use super::{EditPlan, PlanError, PlanStep};
 
     fn step(tool: &str) -> PlanStep {
-        PlanStep {
-            tool: tool.to_string(),
-            args: serde_json::json!({}),
-            why: String::new(),
-        }
+        PlanStep { tool: tool.to_string(), args: serde_json::json!({}), why: String::new() }
     }
 
     #[test]
     fn a_valid_plan_validates() {
-        let plan = EditPlan {
-            summary: "Rough cut the interview".to_string(),
-            steps: vec![step("edit.rough_cut"), step("command.run")],
-            dry_run: true,
-        };
+        let plan = EditPlan { summary: "Rough cut the interview".to_string(), steps: vec![step("edit.rough_cut"), step("command.run")], dry_run: true };
         assert_eq!(plan.validate(), Ok(()));
         assert_eq!(plan.mutating_steps().len(), 2);
         assert!(plan.requires_approval());
@@ -141,37 +114,21 @@ mod tests {
 
     #[test]
     fn rejects_empty_plans() {
-        let plan = EditPlan {
-            summary: String::new(),
-            steps: Vec::new(),
-            dry_run: true,
-        };
+        let plan = EditPlan { summary: String::new(), steps: Vec::new(), dry_run: true };
         assert_eq!(plan.validate(), Err(PlanError::EmptySummary));
 
-        let plan = EditPlan {
-            summary: "Nothing".to_string(),
-            steps: Vec::new(),
-            dry_run: true,
-        };
+        let plan = EditPlan { summary: "Nothing".to_string(), steps: Vec::new(), dry_run: true };
         assert_eq!(plan.validate(), Err(PlanError::EmptyPlan));
     }
 
     #[test]
     fn rejects_unknown_tools_and_bad_args() {
-        let plan = EditPlan {
-            summary: "Nope".to_string(),
-            steps: vec![step("edit.nope")],
-            dry_run: true,
-        };
+        let plan = EditPlan { summary: "Nope".to_string(), steps: vec![step("edit.nope")], dry_run: true };
         assert!(matches!(plan.validate(), Err(PlanError::UnknownTool { index: 0, .. })));
 
         let plan = EditPlan {
             summary: "Bad args".to_string(),
-            steps: vec![PlanStep {
-                tool: "edit.rough_cut".to_string(),
-                args: serde_json::json!([1, 2, 3]),
-                why: String::new(),
-            }],
+            steps: vec![PlanStep { tool: "edit.rough_cut".to_string(), args: serde_json::json!([1, 2, 3]), why: String::new() }],
             dry_run: true,
         };
         assert!(matches!(plan.validate(), Err(PlanError::InvalidArgs { index: 0, .. })));
@@ -179,19 +136,14 @@ mod tests {
 
     #[test]
     fn rejects_runaway_plans() {
-        let plan = EditPlan {
-            summary: "Too much".to_string(),
-            steps: (0..=EditPlan::MAX_STEPS).map(|_| step("edit.rough_cut")).collect(),
-            dry_run: true,
-        };
+        let plan = EditPlan { summary: "Too much".to_string(), steps: (0..=EditPlan::MAX_STEPS).map(|_| step("edit.rough_cut")).collect(), dry_run: true };
         assert!(matches!(plan.validate(), Err(PlanError::TooManySteps { .. })));
     }
 
     #[test]
     fn plans_are_dry_by_default() {
         assert!(EditPlan::default().dry_run);
-        let from_json: EditPlan =
-            serde_json::from_str(r#"{"summary":"s","steps":[]}"#).unwrap();
+        let from_json: EditPlan = serde_json::from_str(r#"{"summary":"s","steps":[]}"#).unwrap();
         assert!(from_json.dry_run);
     }
 }

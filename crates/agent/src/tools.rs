@@ -35,70 +35,25 @@ pub struct ToolSpec {
 }
 
 const fn director(name: &'static str, summary: &'static str) -> ToolSpec {
-    ToolSpec {
-        name,
-        tier: Tier::Director,
-        mutates: true,
-        needs_approval: true,
-        summary,
-    }
+    ToolSpec { name, tier: Tier::Director, mutates: true, needs_approval: true, summary }
 }
 
 /// The elevated tier: composite editing workflows offered to the agent only.
 pub const DIRECTOR_TOOLS: &[ToolSpec] = &[
-    director(
-        "edit.rough_cut",
-        "Transcribe and score a bin, propose selects, and lay a target-length rough cut on the timeline.",
-    ),
-    director(
-        "edit.montage",
-        "Cut a set of shots to a music bed on its beat/downbeat grid in a chosen style.",
-    ),
-    director(
-        "edit.remove_silence",
-        "Detect dead air across dialogue tracks and ripple it out with handles and padding.",
-    ),
-    director(
-        "edit.multicam_sync",
-        "Sync multiple angles by audio/visual correlation and build a multicam sequence.",
-    ),
-    director(
-        "edit.reframe",
-        "Reframe a sequence to another aspect ratio with subject tracking and title-safe margins.",
-    ),
-    director(
-        "color.match",
-        "Match a clip's grade to a reference frame or shot and write the resulting grade.",
-    ),
-    director(
-        "audio.duck",
-        "Write music ducking automation under dialogue with configurable depth and release.",
-    ),
-    director(
-        "audio.conform",
-        "Conform a mix to a loudness target (for example -14 or -23 LUFS) with true-peak limits.",
-    ),
-    director(
-        "caption.generate",
-        "Transcribe speech, segment it, and create a styled caption track, optionally burned in.",
-    ),
-    director(
-        "fx.recipe",
-        "Apply a named, parameterized effect stack consistently across selected clips.",
-    ),
-    director(
-        "delivery.variants",
-        "Render several aspect-ratio or length variants from one timeline with per-variant reframes.",
-    ),
+    director("edit.rough_cut", "Transcribe and score a bin, propose selects, and lay a target-length rough cut on the timeline."),
+    director("edit.montage", "Cut a set of shots to a music bed on its beat/downbeat grid in a chosen style."),
+    director("edit.remove_silence", "Detect dead air across dialogue tracks and ripple it out with handles and padding."),
+    director("edit.multicam_sync", "Sync multiple angles by audio/visual correlation and build a multicam sequence."),
+    director("edit.reframe", "Reframe a sequence to another aspect ratio with subject tracking and title-safe margins."),
+    director("color.match", "Match a clip's grade to a reference frame or shot and write the resulting grade."),
+    director("audio.duck", "Write music ducking automation under dialogue with configurable depth and release."),
+    director("audio.conform", "Conform a mix to a loudness target (for example -14 or -23 LUFS) with true-peak limits."),
+    director("caption.generate", "Transcribe speech, segment it, and create a styled caption track, optionally burned in."),
+    director("fx.recipe", "Apply a named, parameterized effect stack consistently across selected clips."),
+    director("delivery.variants", "Render several aspect-ratio or length variants from one timeline with per-variant reframes."),
     director("qc.check", "Run delivery QC: offline media, black holes, flash frames, loudness, caption overflow."),
-    director(
-        "review.self_critique",
-        "Render key frames, score the cut against the brief, and propose concrete fixes.",
-    ),
-    director(
-        "history.checkpoint",
-        "Name a restore point for this turn so the user can return to it in one action.",
-    ),
+    director("review.self_critique", "Render key frames, score the cut against the brief, and propose concrete fixes."),
+    director("history.checkpoint", "Name a restore point for this turn so the user can return to it in one action."),
 ];
 
 /// Look up a director tool by its MCP name.

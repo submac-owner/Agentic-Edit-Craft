@@ -11,14 +11,7 @@
 //! project state directly. A turn is applied as commands, grouped under one undo
 //! label, so "undo last agent turn" is a single user action.
 
-#![deny(
-    clippy::unwrap_used,
-    clippy::expect_used,
-    clippy::panic,
-    clippy::unimplemented,
-    clippy::todo,
-    clippy::unreachable
-)]
+#![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 pub mod plan;
 pub mod session;
@@ -28,4 +21,4 @@ pub mod tools;
 pub use plan::{EditPlan, PlanError, PlanStep};
 pub use session::{AgentSession, Role, TranscriptEntry};
 pub use settings::{Approval, ProviderKind, ResolvedModel, Settings, SettingsError};
-pub use tools::{Tier, ToolSpec, DIRECTOR_TOOLS, director_tool};
+pub use tools::{DIRECTOR_TOOLS, Tier, ToolSpec, director_tool};

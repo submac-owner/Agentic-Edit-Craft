@@ -10,11 +10,6 @@ pub fn wordmark(_ctx: &egui::Context, _dark: bool) -> Option<egui::TextureHandle
 }
 
 /// Draw nothing. Returns `None`, so callers fall back to text-only layouts.
-pub fn paint_wordmark(
-    _ui: &egui::Ui,
-    _left_center: egui::Pos2,
-    _height: f32,
-    _dark: bool,
-) -> Option<egui::Rect> {
+pub fn paint_wordmark(_ui: &egui::Ui, _left_center: egui::Pos2, _height: f32, _dark: bool) -> Option<egui::Rect> {
     None
 }
