@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "agentic-edit-craft": {
+      "command": "target/release/filmcraft-cli.exe",
+      "args": ["mcp", "--bridge", "127.0.0.1:9876"]
+    },
+    "agentic-edit-craft-headless": {
+      "command": "target/release/filmcraft-cli.exe",
+      "args": ["mcp", "--demo"]
+    }
+  }
+}

@@ -1,0 +1,66 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  agent-tests:
+    name: agent crate (fmt, clippy, tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: agent-linux
+      - name: Format
+        run: cargo fmt -p agentic-edit-agent -- --check
+      - name: Clippy
+        run: cargo clippy -p agentic-edit-agent --all-targets -- -D warnings
+      - name: Test
+        run: cargo test -p agentic-edit-agent --all-targets
+
+  windows-app:
+    name: Windows app + CLI
+    runs-on: windows-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: app-windows
+      - name: Build
+        run: cargo build --release -p filmcraft -p filmcraft-cli
+      - name: Smoke test (headless)
+        run: |
+          ./target/release/filmcraft-cli.exe --version
+          ./target/release/filmcraft-cli.exe --demo inspect sequence | Out-Null
+          ./target/release/filmcraft-cli.exe commands --json | Out-Null
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentic-edit-craft-windows-x64
+          if-no-files-found: error
+          path: |
+            target/release/filmcraft.exe
+            target/release/filmcraft-cli.exe
+            LICENSE-MIT
+            LICENSE-APACHE
+            NOTICE
+            FORK-NOTICE.md

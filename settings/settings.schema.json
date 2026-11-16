@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agentic Edit Craft agent settings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "agent", "providers"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Key in models, or provider/model shorthand."
+        },
+        "temperature": { "type": "number", "minimum": 0, "maximum": 2 },
+        "maxSteps": { "type": "integer", "minimum": 1, "maximum": 500 },
+        "approval": {
+          "type": "string",
+          "enum": ["all", "edits", "none"],
+          "description": "all: ask for every call; edits: ask before mutating calls; none: never ask."
+        },
+        "undoPerTurn": { "type": "boolean" }
+      }
+    },
+    "providers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["anthropic", "openai", "openaiCompatible", "google"]
+          },
+          "baseUrl": { "type": "string" },
+          "apiKeyEnv": {
+            "type": ["string", "null"],
+            "description": "Environment variable holding the key; null for local endpoints."
+          }
+        }
+      }
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "model"],
+        "properties": {
+          "provider": { "type": "string" },
+          "model": { "type": "string" },
+          "context": { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  }
+}

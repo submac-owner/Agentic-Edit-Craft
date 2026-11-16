@@ -1,0 +1,18 @@
+*~
+plan/
+/target
+/crates/*/target/
+/dist
+/log
+.DS_Store
+.claude/worktrees/
+__pycache__/
+
+# Local artifacts and downloaded upstream snapshot (never commit)
+/vendor/
+/_upstream/
+
+# Local settings overrides and secrets
+.env
+*.token
+settings/local.json
