@@ -21,7 +21,7 @@ jobs:
     name: agent crate (fmt, clippy, tests)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -40,7 +40,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 150
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
@@ -53,7 +53,7 @@ jobs:
           ./target/release/filmcraft-cli.exe --demo inspect sequence | Out-Null
           ./target/release/filmcraft-cli.exe commands --json | Out-Null
       - name: Upload binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: agentic-edit-craft-windows-x64
           if-no-files-found: error
