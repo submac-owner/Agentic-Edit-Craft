@@ -81,7 +81,8 @@ A crash loses hours of editing work, so this rule outranks every feature.
 - Quality gates before a commit: `cargo xtask ci` (fmt, clippy `-D warnings`, tests, layers, assets,
   wasm). One task id per commit, green states only.
 - Do not commit media or large binary fixtures. Generate them into `target/fixtures/`.
-- `main` changes through a pull request. Never push to it.
+- `main` stays green: a commit to `main` is only acceptable while this repository has a single
+  maintainer; once there is a second, changes arrive through a pull request.
 
 ## 7. Checking before claiming
 
